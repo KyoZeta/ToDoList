@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.FirebaseDatabase
 import com.redb.to_dolist.DB.AppDatabase
 import com.google.firebase.database.DatabaseReference
@@ -214,9 +215,10 @@ class AddEditTaskFragment : Fragment() {
                 taskRef.child("title").setValue(addEdit_EditText_Nombre.text.toString())
                 taskRef.child("importance").setValue(prioridad)
 
+//                Toast.makeText(view.context, "La tarea ha sido agregada con exito", Toast.LENGTH_SHORT)
+//                    .show()
 
-                Toast.makeText(view.context, "La tarea ha sido agregada con exito", Toast.LENGTH_SHORT)
-                    .show()
+                Snackbar.make(it,"La tarea ha sido agregada con exito", Snackbar.LENGTH_SHORT).show()
             }
         }
 

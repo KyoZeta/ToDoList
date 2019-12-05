@@ -171,12 +171,16 @@ class AddEditTaskFragment : Fragment() {
             if (addEdit_EditText_Nombre.text.isBlank()) {
 
 
-                Toast.makeText(
-                    view.context,
-                    "No puedes crear una tarea sin titulo",
-                    Toast.LENGTH_SHORT
-
-                ).show()
+//                Toast.makeText(
+//                    view.context,
+//                    "No puedes crear una tarea sin titulo",
+//                    Toast.LENGTH_SHORT
+//
+//
+//
+//                ).show()
+//
+                Snackbar.make(it, "No puedes crear una tarea sin titulo", Snackbar.LENGTH_SHORT).show()
 
             } else {
                 //val taskRef : DatabaseReference

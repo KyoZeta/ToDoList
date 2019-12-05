@@ -12,4 +12,13 @@ interface AplicacionDao {
 
     @Query("SELECT logedUser FROM Aplicacion WHERE idAplicacion = 0")
     fun getLoggedUser() : String?
+
+    @Query("UPDATE Aplicacion SET logedUser=:id")
+    fun logearUsuario(id:String)
+
+    @Query("UPDATE Aplicacion SET lastView=:listId")
+    fun setearLista(listId:String)
+
+    @Query("SELECT lastView FROM Aplicacion WHERE idAplicacion=0")
+    fun getAplicationList():String
 }

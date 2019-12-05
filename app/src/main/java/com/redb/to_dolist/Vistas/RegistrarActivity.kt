@@ -22,7 +22,7 @@ class RegistrarActivity : AppCompatActivity() {
     private lateinit var imagen: ImageView
     private lateinit var btnRegistrar: Button
 
-    private lateinit var btnprueba:Button
+    private lateinit var btnprueba: Button
     private val model by lazy { ViewModelProviders.of(this)[RegistroVM::class.java] }
     private var index = 0
 
@@ -45,8 +45,7 @@ class RegistrarActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registrar)
 
-        val db = AppDatabase.getAppDatabase(this)
-        Stetho.initializeWithDefaults(this)
+
 
         nombreUsuario = findViewById(R.id.NombreUsuario)
         correoElectronico = findViewById(R.id.CorreoRegistro)
@@ -55,45 +54,77 @@ class RegistrarActivity : AppCompatActivity() {
 
         btnRegistrar = findViewById(R.id.btnRegistrar)
         imagen = findViewById(R.id.ImagenId)
+        btnRegistrar = findViewById(R.id.btnRegistrar)
 
+        imagen.setOnClickListener {
+            seleccionarFoto()
+            imagen.setImageResource(obtenerFoto(fotoIndex))
+        }
+        btnRegistrar.setOnClickListener {
 
+            if (nombreUsuario.text.isEmpty() ||
+                correoElectronico.text.isEmpty() ||
+                contraseña.text.isEmpty() ||
+                confirmarContraseña.text.isEmpty()
+            ) {
+                Snackbar.make(it, "Llene todos los campos", Snackbar.LENGTH_LONG).show()
+            } else {
+                if (contraseña.text.toString() == confirmarContraseña.text.toString()) {
+                    var usuarioRegistro = Usuario(
+                        correoElectronico.text.toString(),
+                        nombreUsuario.text.toString(),
+                        contraseña.text.toString(),
+                        fotoIndex,
+                        correoElectronico.text.toString()
+                    )
+                    model.SetDatos(usuarioRegistro, confirmarContraseña.text.toString())
+                    val database = FirebaseDatabase.getInstance()
+                    val usersRef = database.getReference("App").child("users")
 
+                    val loginReference =
+                        usersRef.orderByChild("email").equalTo(correoElectronico.text.toString())
+                    loginReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
 
+                            if (!dataSnapshot.hasChildren() && !dataSnapshot.children.iterator().hasNext()) {
+                                confirmarContraseña.text.clear()
+                                contraseña.text.clear()
+                                nombreUsuario.text.clear()
+                                correoElectronico.text.clear()
+                                model.RegistrarUsuario()
+                                Snackbar.make(it, "Registro Exitoso", Snackbar.LENGTH_LONG).show()
 
-        /*  usersRef.addChildEventListener(object : ChildEventListener {
-              override fun onCancelled(p0: DatabaseError) {
+                                val intent =
+                                    Intent(this@RegistrarActivity, LoginActivity::class.java)
+                                startActivity(intent)
+                            } else Snackbar.make(
+                                it,
+                                "El Correo Proporcionado ya existe",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
 
-              }
-
-              override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-
-              }
-
-              override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-
-              }
-
-              override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-                  val user: Usuario? = p0.getValue(Usuario::class.java)
-                  user?.userName = p0.key!!
-              }
-
-              override fun onChildRemoved(p0: DataSnapshot) {
-
-              }
-
-
-          })*/
-
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            throw databaseError.toException() as Throwable
+                        }
+                    })
+                } else Snackbar.make(
+                    it,
+                    "Las contraseñas no coinciden",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     fun seleccionarFoto() {
+        imagen.resources
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Elige una foto de perfil")
 
         val adaptadorDialogo =
             ArrayAdapter<String>(this, android.R.layout.simple_selectable_list_item)
-        adaptadorDialogo.add("Mujer Zombi")
+        adaptadorDialogo.add("Mujer Zombie")
         adaptadorDialogo.add("Buffon")
         adaptadorDialogo.add("Payaso")
         adaptadorDialogo.add("Persona Loca")
@@ -122,10 +153,9 @@ class RegistrarActivity : AppCompatActivity() {
         return fotos.get(indice)
     }
 
-
-    fun obtnerIndice(num: Int) {
-        val indice = num
-        index = indice
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finishAffinity()
     }
+
 }
